@@ -23,4 +23,22 @@ before_script:
 - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
 script:
 - composer test
-
+before_deploy:
+  - rm -rf tests
+  - rm -rf bin
+  - composer install --no-dev
+  - rm -rf .git
+  - "curl -L https://raw.githubusercontent.com/fumikito/wp-readme/master/wp-readme.php | php"
+  - rm -rf {.gitignore,.travis.yml,phpunit.xml.dist,README.md}
+  - sed -i -e "s/nightly/${TRAVIS_TAG}/" readme.txt
+  - sed -i -e "s/nightly/${TRAVIS_TAG}/" $(basename $TRAVIS_REPO_SLUG).php
+  - zip -r stan-plugin.zip ./
+deploy:
+  provider: releases
+  api_key:
+    secure: EieJgGQ+65XmVwoojL9iHyv7yTXO+/Xe+7SkPJnm5rgJjW/vTs6EFrO926OdDEux5RB0iwZkK9yz8+s4fKT1htiZDqk60wlCyOFxall+Y9RW6wJHNvYlQSueIwwyQRQO3Oz1m3sqm68m8fDJ5+d7d8tZOO4yKBpQCcLnaQGQ9DINAwIliI348IqndKkhMpRE0nuDMis25J8xDoe/NkMSY7QJQ4/M8+dCqACI7sEsgOl6n08lWWG7xox4WxiE9+sb+MqSC+Klm4ywrqPIlw8WyxTG627Iqof2PYoX5o9v924b7WyXaAOyLN7w3nNoenRyLqjLbiRBVU5UiOra4Z3XX9/X1vmdnhuOy4FMH9m4Oz6unQ5x3HiaMMknbCM/0IfrQwfufuqUAkseW26RdSUA8NpDE3GU06cI/XOQsr4l/jz9JlXo4rV15Fa7VmHiy9K0zsN3u19rL6uBQ0jNJWV0NJqXXA8VkRNmBG8BJjpqVSDe7SJ+L4nAcHRjvVQBKKVzZvXbkVKXCz7s5hEeq1sd7VQgMRY0M6ljH/xXKGaNH1lV5ErIlq8OWQb0sNe4sZPtyFqYw8PnUHxtwoaPxwBMoh5TIROTJJgLFZJAyPgBKkW1Q8wao9Z8due4+n7AJQ4cUCJsOYQfUkyeBn6QfpJ2hAZIEpyRxU2ZavCq44xQsp8=
+  file: stan-plugin.zip
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: kuno1/stan-plugin
