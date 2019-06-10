@@ -17,6 +17,10 @@ This plugin does nothing.
 
 ## Changelog
 
+### 1.2.0
+
+* Second release.
+
 ### 1.1.0
 
-First release.
+* First release.
